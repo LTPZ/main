@@ -1,20 +1,20 @@
 package compal.logic.parser;
 
 import compal.commons.Compal;
+import compal.logic.commands.HelpCommand;
+import compal.logic.commands.ListCommand;
+import compal.logic.commands.AcadCommand;
+import compal.logic.commands.ViewCommand;
+import compal.logic.commands.SetReminderCommand;
+import compal.logic.commands.RecurTaskCommand;
+import compal.logic.commands.FindCommand;
+import compal.logic.commands.EventCommand;
+import compal.logic.commands.DoneCommand;
+import compal.logic.commands.DeleteCommand;
+import compal.logic.commands.DeadlineCommand;
 import compal.logic.commands.ByeCommand;
 import compal.logic.commands.ClearCommand;
-import compal.logic.commands.DeadlineCommand;
-import compal.logic.commands.DeleteCommand;
-import compal.logic.commands.DoAfterCommand;
-import compal.logic.commands.DoneCommand;
-import compal.logic.commands.EventCommand;
-import compal.logic.commands.FindCommand;
-import compal.logic.commands.FixedDurationCommand;
-import compal.logic.commands.ListCommand;
-import compal.logic.commands.RecurTaskCommand;
-import compal.logic.commands.SetReminderCommand;
-import compal.logic.commands.ViewCommand;
-import compal.logic.commands.ViewReminderCommand;
+
 import compal.model.tasks.TaskList;
 
 import static compal.commons.Messages.MESSAGE_INVALID_COMMAND;
@@ -35,8 +35,6 @@ public class ParserManager {
     static final String CMD_DELETE = "delete";
     static final String CMD_EVENT = "event";
     static final String CMD_DEADLINE = "deadline";
-    static final String CMD_DO_AFTER_TASK = "doaftertask";
-    static final String CMD_FIXED_DURATION_TASK = "fixeddurationtask";
     static final String CMD_RECUR_TASK = "recurtask";
     static final String CMD_VIEW = "view";
     static final String CMD_FIND = "find";
@@ -46,6 +44,7 @@ public class ParserManager {
     static final String CMD_TUT = "tut";
     static final String CMD_SECT = "sect";
     static final String CMD_LAB = "lab";
+    static final String CMD_HELP = "help";
 
     /*
      * Status tells the parser if ComPAL is expecting an answer from a prompt it gave. Parser will then
@@ -96,6 +95,7 @@ public class ParserManager {
      * @throws Compal.DukeException If command input is unknown or user input is empty.
      */
     public void processCmd(String userInput) throws ParseException, Compal.DukeException {
+        compal.ui.clearPrimary();
         Scanner sc = new Scanner(userInput);
         if (sc.hasNext()) {
             String cmd = sc.next();
@@ -131,19 +131,14 @@ public class ParserManager {
                     DeadlineCommand deadline = new DeadlineCommand(compal);
                     deadline.parseCommand(userInput);
                     break;
-                case CMD_DO_AFTER_TASK:
-                    DoAfterCommand doafter = new DoAfterCommand(compal);
-                    doafter.parseCommand(userInput);
-                    break;
-                case CMD_FIXED_DURATION_TASK:
-                    FixedDurationCommand fixedduration = new FixedDurationCommand(compal);
-                    fixedduration.parseCommand(userInput);
-                    break;
-                case CMD_RECUR_TASK:
                 case CMD_LECT:
                 case CMD_TUT:
                 case CMD_SECT:
                 case CMD_LAB:
+                    AcadCommand acad = new AcadCommand(compal);
+                    acad.parseCommand(userInput);
+                    break;
+                case CMD_RECUR_TASK:
                     RecurTaskCommand recurTask = new RecurTaskCommand(compal);
                     recurTask.parseCommand(userInput);
                     break;
@@ -155,13 +150,13 @@ public class ParserManager {
                     ViewCommand viewCommand = new ViewCommand(compal);
                     viewCommand.parseCommand(userInput);
                     break;
-                case CMD_VIEW_REMIND:
-                    ViewReminderCommand viewReminderCommand = new ViewReminderCommand(compal);
-                    viewReminderCommand.parseCommand(userInput);
-                    break;
                 case CMD_SET_REMINDER:
                     SetReminderCommand setReminderCommand = new SetReminderCommand(compal);
                     setReminderCommand.parseCommand(userInput);
+                    break;
+                case CMD_HELP:
+                    HelpCommand helpCommand = new HelpCommand(compal);
+                    helpCommand.parseCommand(userInput);
                     break;
                 default:
                     compal.ui.printg(MESSAGE_INVALID_COMMAND);

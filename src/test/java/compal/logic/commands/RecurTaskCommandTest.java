@@ -11,7 +11,7 @@ public class RecurTaskCommandTest {
     private Compal compal;
 
     @BeforeEach
-    public void setup() {
+    public void setUp() {
         compal = new Compal();
         recurTask = new RecurTaskCommand(compal);
     }
@@ -23,12 +23,32 @@ public class RecurTaskCommandTest {
     }
 
     @Test
-    public void parseCommandTest() {
-        String command = "deadline /date 09/10/2019 /end 1230";
-        try {
-            recurTask.parseCommand(command);
-        } catch (Exception t) {
-            //ignore the null pointer exception because ui is not welly declared in this test
-        }
+    public void getRepTest() throws Compal.DukeException {
+        String command = "/rep 5";
+        assertEquals(5, recurTask.getRep(command));
+    }
+
+    @Test
+    public void getEndDateTest() throws Compal.DukeException {
+        String time = "15/10/2019";
+        String command = "/edate 15/10/2019";
+        assertEquals(time, recurTask.getEndDate(command));
+    }
+
+    @Test
+    public void getFreqTest() {
+        String command = "/freq 6";
+        assertEquals(6, recurTask.getFreq(command));
+        command = "trash";
+        assertEquals(7, recurTask.getFreq(command));
+        command = "/freq";
+        assertEquals(7, recurTask.getFreq(command));
+    }
+
+    @Test
+    public void incrementDateTest() {
+        String date = "14/10/2019";
+        String newDate = "21/10/2019";
+        assertEquals(newDate, recurTask.incrementDate(date, 7));
     }
 }
