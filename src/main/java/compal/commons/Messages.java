@@ -8,8 +8,9 @@ import java.util.Date;
 
 public class Messages {
 
-
-    public static final String MESSAGE_INVALID_COMMAND = "CommandError: Unknown command input detected!";
+    public static final String MESSAGE_INVALID_COMMAND = "Error: Unknown command input detected!";
+    public static final String MESSAGE_EMPTY_INPUT = "Empty Input: Empty input detected!";
+    public static final String MESSAGE_MISSING_INPUTS = "Error: Missing input detected";
     public static final String MESSAGE_INVALID_RANGE = "RangeError: Invalid range detected for execution of command!";
     public static final String MESSAGE_INVALID_DATE_FORMATTING = "DateFormattingError: Date format input is invalid! "
             + "Please make sure is dd/mm/yyyy format.";
@@ -28,7 +29,6 @@ public class Messages {
     public static final String MESSAGE_MISSING_HOUR = "Empty Hour Error: Required hour input!";
     public static final String MESSAGE_MISSING_MIN = "Empty Min Error: Required minute input!";
     public static final String MESSAGE_MISSING_DATE = "Empty Date Error: Required date input!";
-    public static final String MESSAGE_MISSING_INPUT = "Empty Input: Empty input detected!";
     public static final String MESSAGE_MISSING_TIME = "MissingTimeError: Time field cannot be empty."
             + " Please enter a valid time.";
     public static final String MESSAGE_MISSING_PRIORITY = "MissingPriorityError: Priority "
@@ -50,6 +50,9 @@ public class Messages {
     public static final String MESSAGE_MISSING_COMMAND_ARG = "ArgumentError: Missing argument detected!";
     public static final String MESSAGE_MISSING_EDATE_ARG = "ArgumentError: Missing /edate";
     public static final String MESSAGE_INIT_REMINDER = "view-reminder";
+    public static final String MESSAGE_INVALID_DATE = "DateError: You can only input current or future date!";
+    public static final String MESSAGE_INVALID_TASK_ID = "TaskIDError: No such task found";
+    public static final String MESSAGE_INVALID_PRIORITY = "No such priority level";
     private static Date currentDate = java.util.Calendar.getInstance().getTime();
     public static final String MESSAGE_INVALID_DATE_TIME_INPUT = "DateTimeError: You can only add "
             + "task after current date and time:\n" + currentDate;
