@@ -5,10 +5,10 @@ import compal.model.tasks.Event;
 import compal.model.tasks.RecurringTask;
 import compal.model.tasks.Task;
 
+//@@author jaedonkey
 /**
  * Returns Task object based on parts of data stored in the string array.
  *
- * @author jaedonkey
  */
 public class TaskStorageParser implements StorageParser<Task> {
 
@@ -40,7 +40,7 @@ public class TaskStorageParser implements StorageParser<Task> {
      * @param priority task priority string
      * @return Priority enum
      */
-    public Task.Priority stringToPriority(String priority) {
+    private Task.Priority stringToPriority(String priority) {
         return Task.Priority.valueOf(priority.toLowerCase());
     }
 

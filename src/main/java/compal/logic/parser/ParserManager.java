@@ -57,13 +57,22 @@ public class ParserManager {
             return new SetReminderParser().parseCommand(restOfInput);
         case CMD_VIEW_REMINDER:
             return new ViewReminderParser().parseCommand(restOfInput);
+        case CMD_FIND_FREE_SLOT:
+            return new FindFreeSlotParser().parseCommand(restOfInput);
         case CMD_DEADLINE:
             return new DeadlineCommandParser().parseCommand(restOfInput);
         case CMD_DONE:
             return new DoneParser().parseCommand(restOfInput);
+        case CMD_FIND:
+            return new FindCommandParser().parseCommand(restOfInput);
+        case CMD_EVENT:
+            return new EventCommandParser().parseCommand(restOfInput);
+        case CMD_EDIT:
+            return new EditCommandParser().parseCommand(restOfInput);
         default:
+            return new HelpCommandParser().parseCommand(restOfInput);
             //suppose to return helpCommand();
-            throw new ParserException(MESSAGE_INVALID_COMMAND);
+            //throw new ParserException(MESSAGE_INVALID_COMMAND);
         }
 
     }

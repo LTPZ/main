@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+//@@author jaedonkey
 public class UiManager implements Ui {
     private UiUtil uiUtil;
 
@@ -46,17 +47,6 @@ public class UiManager implements Ui {
             mainTab.setText("Main Window");
             mainTab.setContent(mainPane);
             tabReference.getTabs().add(0, mainTab);
-
-            //Create DailyCalUI Pane
-            DailyCalUi dc = new DailyCalUi();
-            String datePattern = "dd/MM/yyyy";
-            String stringTodayDate = new SimpleDateFormat(datePattern).format(new Date());
-            ScrollPane dailyPane = dc.init(stringTodayDate);
-
-            Tab dailyTab = new Tab();
-            dailyTab.setText("Daily View: " + stringTodayDate);
-            dailyTab.setContent(dailyPane);
-            tabReference.getTabs().add(1, dailyTab);
 
             uiUtil.setMainWindow(mainPane);
             Scene s1 = new Scene(ap);
