@@ -5,6 +5,8 @@ import compal.logic.command.Command;
 import compal.model.tasks.Task;
 import compal.logic.parser.exceptions.ParserException;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 
@@ -40,10 +42,12 @@ public interface CommandParser {
     String TOKEN_HOUR = "/hour";
     String TOKEN_MIN = "/min";
     String TOKEN_INTERVAL = "/interval";
+    String TOKEN_FILE_NAME = "/file-name";
 
 
     String EMPTY_INPUT_STRING = "";
     int DEFAULT_WEEK_NUMBER_OF_DAYS = 7;
+    int INDEX_ZERO = 0;
 
     /**
      * ERROR MESSAGES BELOW.
@@ -62,7 +66,10 @@ public interface CommandParser {
     String MESSAGE_INVALID_TYPE = "Error: The type does not exist!";
     String MESSAGE_INVALID_PRIORITY = "Invalid Priority Input";
     String MESSAGE_LIMIT_EXCEEDED = "Error: Input entered is out of range!";
-
+    String MESSAGE_INVALID_FILE_NAME_FORMAT = "Error: Invalid file name for export!";
+    String MESSAGE_INVALID_FILE_NAME_TIME = "Error: Invalid final date time";
+    String MESSAGE_MISSING_FILE_NAME_ARG = "ArgumentError: Missing /file-name";
+    String MESSAGE_MISSING_FILE_NAME = "Error: Missing file name input!";
 
     /**
      * Method specification for different command parsers to parse user input.
@@ -78,6 +85,7 @@ public interface CommandParser {
      */
 
     //@@author SholihinK
+
     /**
      * Returns the type of task.
      *
@@ -115,6 +123,7 @@ public interface CommandParser {
     }
 
     //@@author Catherinetan99
+
     /**
      * Returns the reminder status in the String input.
      *
@@ -139,6 +148,7 @@ public interface CommandParser {
         }
     }
 
+    //@@author LTPZ
     /**
      * Returns the hour in the String input.
      *
@@ -240,6 +250,25 @@ public interface CommandParser {
     }
 
     /**
+     * Returns if the input date is a future date.
+     *
+     * @param date input date
+     * @return true if date is a future date, false otherwise
+     */
+    default boolean isFutureDate(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        Date currentDate = calendar.getTime();
+        Calendar inputDate = Calendar.getInstance();
+        inputDate.setTime(date);
+        return date.after(currentDate) || date.equals(currentDate);
+    }
+
+    //@@author LTPZ
+    /**
      * Parses through user input for description field, and returns the description if present.
      *
      * @param restOfInput String input of user after command word
@@ -259,6 +288,7 @@ public interface CommandParser {
     }
 
     //@@author yueyeah
+
     /**
      * Parses user input for optional interval token, and returns the interval specified.
      *
@@ -283,6 +313,7 @@ public interface CommandParser {
     }
 
     //@@author yueyeah
+
     /**
      * Returns a date string if specified in the task.
      *
@@ -327,6 +358,7 @@ public interface CommandParser {
         }
     }
 
+    //@@author LTPZ
     /**
      * Parses through user input for priority token, and returns the enum priority if present.
      *
@@ -357,6 +389,7 @@ public interface CommandParser {
     }
 
     //@@author yueyeah
+
     /**
      * Parses through user input for /start token and return the start time.
      *
@@ -384,6 +417,7 @@ public interface CommandParser {
         }
     }
 
+    //@@author LTPZ
     /**
      * Parses through user input for /end token and return the end time.
      *
@@ -412,6 +446,7 @@ public interface CommandParser {
     }
 
     //@@author yueyeah
+
     /**
      * Parses through the user input for /final-date token and return the final date of iteration of events/deadline.
      * The presence of the /final-date token must be checked first in the specialised
@@ -438,11 +473,44 @@ public interface CommandParser {
         }
     }
 
+    //@@author SholihinK
+
+    /**
+     * check if file name to read/write is valid and if file-name tag exist.
+     *
+     * @param restOfInput the rest of input
+     * @return string of file name to write
+     * @throws ParserException if fileName is not valid
+     */
+    default String getFileName(String restOfInput) throws ParserException {
+        if (restOfInput.contains(TOKEN_FILE_NAME)) {
+            int startPoint = restOfInput.indexOf(TOKEN_FILE_NAME);
+            String startInput = restOfInput.substring(startPoint);
+            Scanner scanner = new Scanner(startInput);
+            scanner.next();
+            if (!scanner.hasNext()) {
+                throw new ParserException(MESSAGE_MISSING_FILE_NAME);
+            }
+            String fileName = scanner.next();
+            File f = new File(fileName);
+            try {
+                f.getCanonicalPath();
+                return fileName;
+            } catch (IOException e) {
+                throw new ParserException(MESSAGE_INVALID_FILE_NAME_FORMAT);
+            }
+        } else {
+            throw new ParserException(MESSAGE_MISSING_FILE_NAME_ARG);
+        }
+    }
+
+
     /**
      * MISCELLANEOUS METHODS BELOW
      */
 
     //@@author SholihinK
+
     /**
      * Checks if input date and time is after current date time.
      *
@@ -467,6 +535,7 @@ public interface CommandParser {
     }
 
     //@@author SholihinK
+
     /**
      * Check if the date input is of valid format.
      *
@@ -496,6 +565,7 @@ public interface CommandParser {
     }
 
     //@@author yueyeah
+
     /**
      * Check if the time input is of valid format.
      *
@@ -510,6 +580,7 @@ public interface CommandParser {
     }
 
     //@@author yueyeah
+
     /**
      * Check if the priority input is valid.
      *
@@ -523,7 +594,29 @@ public interface CommandParser {
         return matcher.matches();
     }
 
+    //@author LTPZ
+    /**
+     * Check if the final date is after start date.
+     *
+     * @param startDate The final date string
+     * @param finalDate The start date string
+     * @throws ParserException if final date is not after the start date
+     */
+    default void isFinalDateAfterStartDate(String startDate, String finalDate) throws ParserException {
+        Calendar c = Calendar.getInstance();
+        Date dayStart = CompalUtils.stringToDate(startDate);
+        c.setTime(dayStart);
+        Date dateStart = c.getTime();
+        Date dayEnd = CompalUtils.stringToDate(finalDate);
+        c.setTime(dayEnd);
+        Date dateEnd = c.getTime();
+        if (dateStart.after(dateEnd)) {
+            throw new ParserException(MESSAGE_INVALID_FILE_NAME_TIME);
+        }
+    }
+
     //@@author yueyeah
+
     /**
      * Check if the user input contains the token. Used to check for optional arguments like /final-date.
      *

@@ -21,17 +21,17 @@ import java.util.logging.Logger;
 public class ViewCommand extends Command {
 
     public static final String MESSAGE_USAGE = "view\n\t"
-        + "Format: view {day [/date dd/mm/yyyy]}|{week [dd/mm/yyyy]}|{month [dd/mm/yyyy]}"
+        + "Format: view day|week|month [/date dd/mm/yyyy] "
         + "[/type deadline|event]\n\n\t"
-        + "Note: content in \"{} \": must be entered together\n\t"
-        + "content in \"[]\": optional\n\t"
+        + "Note: content in \\\"[]\\\": optional\n\t"
+        + "You can switch the order of any two blocks (a block starts with \"/\" and ends by the next block)\n\t"
         + "content separated by \"|\": must choose exactly one from them\n\t"
         + "dd/mm/yyyy is the date format. e.g. 01/01/2000\n\n"
         + "This command will view the timetable in a daily/weekly/monthly view\n"
         + "Examples:\n\t"
         + "view day|week|month\n\t\t"
         + "show the timetable of today and the list containing all tasks today|this week|this month\n\t"
-        + "view week 01/01/2019\n\t\t"
+        + "view week /date 01/01/2019\n\t\t"
         + "show the list containing all tasks on the week of 01/01/2019\n\t"
         + "view day /date 01/01/2019 /type deadline:\n\t\t"
         + "show the list containing all deadline type tasks on 01/01/2019";
@@ -127,7 +127,7 @@ public class ViewCommand extends Command {
             + months[givenMonth] + " " + givenYear + " :\n");
 
         for (int i = 1; i <= days; i++) {
-            if (i < 9) {
+            if (i <= 9) {
                 monthlyTask.append(displayDayView("0" + i + "/" + givenMonth + "/" + givenYear, currList));
             } else {
                 monthlyTask.append(displayDayView(i + "/" + givenMonth + "/" + givenYear, currList));
@@ -189,7 +189,9 @@ public class ViewCommand extends Command {
             }
 
             if (t.getStringMainDate().equals(dateInput)) {
-                allTask.append(getAsStringView(t));
+                allTask.append(getAsStringView(t, dateInput));
+            } else if (!t.getStringTrailingDate().equals("-") && t.getStringTrailingDate().equals(dateInput)) {
+                allTask.append(getAsStringView(t, dateInput));
             }
         }
 
@@ -207,7 +209,7 @@ public class ViewCommand extends Command {
 
     }
 
-    private String getAsStringView(Task t) {
+    private String getAsStringView(Task t, String dateInput) {
 
 
         StringBuilder taskDetails = new StringBuilder();
@@ -222,8 +224,28 @@ public class ViewCommand extends Command {
             status = "\u274C";
         }
 
-        String startTime = t.getStringStartTime();
-        String endTime = t.getStringEndTime();
+        String startTime = "";
+        String endTime = "";
+
+        if (dateInput.equals(t.getStringMainDate())) {
+            //if date same
+            if (t.getStringMainDate().equals(t.getStringTrailingDate())) {
+                startTime = t.getStringStartTime();
+                endTime = t.getStringEndTime();
+            } else {
+                startTime = t.getStringStartTime();
+                endTime = "2359";
+            }
+        } else if (dateInput.equals(t.getStringTrailingDate())) {
+            if (t.getStringMainDate().equals(t.getStringTrailingDate())) {
+                startTime = t.getStringStartTime();
+                endTime = t.getStringEndTime();
+            } else {
+                startTime = "0000";
+                endTime = t.getStringEndTime();
+            }
+        }
+
 
         if ("-".equals(startTime)) {
             taskDetails.append("  Due: ").append(endTime)
